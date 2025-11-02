@@ -1,82 +1,38 @@
-# ===========================================
-# Java / Spring Boot .gitignore
-# ===========================================
+target/
+!.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
 
-### Compiled source files
-*.class
-*.jar
-*.war
-*.ear
-
-### Logs
-logs/
-*.log
-
-### Temporary files
-tmp/
-*.tmp
-*.bak
-*.swp
-*.swo
-
-### OS-specific files
-.DS_Store
-Thumbs.db
-
-### IDEs and Editors
-# IntelliJ IDEA
-.idea/
+### IntelliJ IDEA ###
+.idea/modules.xml
+.idea/jarRepositories.xml
+.idea/compiler.xml
+.idea/libraries/
+*.iws
 *.iml
-out/
+*.ipr
 
-# Eclipse
-.project
+### Eclipse ###
+.apt_generated
 .classpath
-.settings/
-bin/
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
 
-# VS Code
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+build/
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+### VS Code ###
 .vscode/
 
-### Maven
-target/
-pom.xml.tag
-pom.xml.releaseBackup
-pom.xml.versionsBackup
-release.properties
-
-### Gradle (in case you use it later)
-.gradle/
-build/
-
-### Spring Boot specific
-# Embedded Tomcat, H2, or temp files
-*.h2.db
-*.mv.db
-*.db
-*.sqlite
-*.log
-!src/main/resources/**
-
-### Environment files
-.env
-*.env
-
-### Security / Credentials
-application-*.yml
-application-*.yaml
-application-*.properties
-!application.properties
-!application.yml
-!application.yaml
-
-### Node (if you use npm/yarn for frontend)
-node_modules/
-dist/
-build/
-package-lock.json
-yarn.lock
-
-### Others
-*.orig
-*.rej
+### Mac OS ###
+.DS_Store
