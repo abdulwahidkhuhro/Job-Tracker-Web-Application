@@ -15,6 +15,14 @@ public class GlobalExceptionHandler {
         return "/exception/user_already_exists_error";
     }
 
+    @ExceptionHandler(UserAuthenticationExceptionHandler.class)
+    public String handleUserAuthenticationException(UserAuthenticationExceptionHandler ex, Model model) {
+        ex.printStackTrace();
+        model.addAttribute("errorTitle", "User Already Exists");
+        model.addAttribute("errorMessage", ex.getMessage());
+        return "/exception/invalid";
+    }
+
     @ExceptionHandler(Exception.class)
     public String handleGenericException(Exception ex, Model model) {
         ex.printStackTrace();

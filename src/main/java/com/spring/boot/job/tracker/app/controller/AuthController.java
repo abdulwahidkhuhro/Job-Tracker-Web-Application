@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import com.spring.boot.job.tracker.app.dtos.user.UserLoginDto;
 import com.spring.boot.job.tracker.app.dtos.user.UserRegistrationDto;
+import com.spring.boot.job.tracker.app.exception.UserAuthenticationExceptionHandler;
 import com.spring.boot.job.tracker.app.service.UserService;
 
 import lombok.extern.slf4j.Slf4j;
@@ -35,9 +36,12 @@ public class AuthController {
     @PostMapping("/login")
     public String processUserLogin(@ModelAttribute("user") UserLoginDto userLoginDto , Model model){
         log.info("Authenticate user for login {}",userLoginDto);
-        // model.addAttribute("username", userLoginDto.getUsername());
-
-        return "redirect:/user/dashboard?username="+userLoginDto.getUsername();
+        if(userServiceObj.authenticateUser(userLoginDto))
+            return "redirect:/user/dashboard?username="+userLoginDto.getUsername();
+        else{
+            model.addAttribute("loginError", "Invalid username or password!");
+            return "login";
+        }
     }
 
 
