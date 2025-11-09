@@ -1,0 +1,182 @@
+SETTING UP THE SPRIG SHCEDULAR AND SPRING MAIL
+
+🧩 Step 1 — Understand the Concepts
+🕒 Spring Scheduler
+
+Spring Scheduler allows you to run tasks automatically at fixed intervals or specific times — without any user action.
+Example use cases:
+Sending daily follow-up reminders
+Cleaning up expired applications
+Generating daily reports
+In simple terms: it’s like setting a cron job inside your Spring app.
+
+📧 Spring Mail
+Spring Mail (built on Jakarta Mail) allows your application to send emails programmatically.
+You’ll configure it with an email service (like Gmail, Outlook, etc.) and use it to send notifications.
+
+----------------------------------------------------------------------------------------------------------------------------------
+
+🧱 Step 2 — Add Dependencies
+In your pom.xml, add these dependencies:
+
+<!-- Spring Boot Starter Mail -->
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-mail</artifactId>
+</dependency>
+
+<!-- Spring Boot Starter for Scheduling -->
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter</artifactId>
+</dependency>
+✅ Note: spring-boot-starter (it includes scheduling core).
+
+----------------------------------------------------------------------------------------------------------------------------------
+
+⚙️ Step 3 — Enable Scheduling
+
+In your main Spring Boot application class (the one annotated with @SpringBootApplication),
+add this line above the class: @EnableScheduling
+
+@SpringBootApplication
+@EnableScheduling
+public class JobTrackerApplication {
+    public static void main(String[] args) {
+        SpringApplication.run(JobTrackerApplication.class, args);
+    }
+}
+This tells Spring Boot to scan for and run any @Scheduled tasks automatically.
+
+----------------------------------------------------------------------------------------------------------------------------------
+
+🧾 Step 4 — Configure Email Settings
+In your application.properties (or application.yml), add:
+# =======================
+# SPRING MAIL CONFIGURATION
+# =======================
+spring.mail.host=smtp.gmail.com
+spring.mail.port=587
+spring.mail.username=your_email@gmail.com
+spring.mail.password=your_app_password
+spring.mail.properties.mail.smtp.auth=true
+spring.mail.properties.mail.smtp.starttls.enable=true
+
+# App info (optional)
+app.mail.from=your_email@gmail.com
+
+
+⚠️ Important:
+Gmail no longer allows normal password-based access.
+You must generate an App Password in your Google Account settings.
+Go to: https://myaccount.google.com/security
+Turn on 2-Step Verification
+Generate an App Password (choose "Mail" → "Other (Custom name)" → e.g., “JobTrackerApp”)
+Use that app password here instead of your normal password.
+
+----------------------------------------------------------------------------------------------------------------------------------
+
+📮 Step 5 — Create an Email Service
+Create a new class: com.spring.boot.job.tracker.app.service.EmailService.java
+
+package com.spring.boot.job.tracker.app.service;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.stereotype.Service;
+
+@Service
+public class EmailService {
+
+    private final JavaMailSender mailSender;
+
+    @Value("${app.mail.from}")
+    private String fromEmail;
+
+    public EmailService(JavaMailSender mailSender) {
+        this.mailSender = mailSender;
+    }
+
+    public void sendEmail(String to, String subject, String text) {
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setFrom(fromEmail);
+        message.setTo(to);
+        message.setSubject(subject);
+        message.setText(text);
+        mailSender.send(message);
+    }
+}
+
+
+✅ This reusable service can send any kind of email.
+
+----------------------------------------------------------------------------------------------------------------------------------
+
+⏰ Step 6 — Create a Scheduled Task
+
+Create a new class: com.spring.boot.job.tracker.app.scheduler.FollowUpScheduler.java
+
+package com.spring.boot.job.tracker.app.scheduler;
+
+import com.spring.boot.job.tracker.app.service.EmailService;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Component;
+
+@Component
+public class FollowUpScheduler {
+
+    private final EmailService emailService;
+
+    public FollowUpScheduler(EmailService emailService) {
+        this.emailService = emailService;
+    }
+
+    // Runs every day at 9 AM
+    @Scheduled(cron = "0 0 9 * * ?")
+    public void sendFollowUpReminders() {
+        // For now, just simulate
+        System.out.println("📅 Checking for follow-up reminders...");
+
+        // Example email (you will later fetch data from DB)
+        String to = "user@example.com";
+        String subject = "Job Application Follow-Up Reminder";
+        String text = "Hi! Don’t forget to follow up on your Google Backend Engineer application today.";
+        emailService.sendEmail(to, subject, text);
+
+        System.out.println("✅ Reminder email sent successfully.");
+    }
+}
+
+}
+
+✅ This task runs daily at 9:00 AM, checks for reminders (you’ll add DB logic later), and sends an email.
+
+
+----------------------------------------------------------------------------------------------------------------------------------
+
+🧠 Step 7 — Verify
+
+1. Start your Spring Boot app.
+2. Watch the console — every morning (or manually trigger cron for testing) you should see:
+📅 Checking for follow-up reminders...
+✅ Reminder email sent successfully.
+
+3. Check your Gmail inbox (for the recipient address).
+You’ll see the test reminder email.
+
+----------------------------------------------------------------------------------------------------------------------------------
+
+✅ Step 8 — (Later) Connect It with Database
+
+When ready, you can make the scheduler:
+Fetch users whose followUpDate equals today’s date.
+Send reminders to only those users.
+That query could look like: List<JobApplication> dueApplications = jobApplicationRepository.findByFollowUpDate(LocalDate.now());
+
+Then loop through and call: emailService.sendEmail(user.getEmail(), subject, text);
+
+
+
+
+

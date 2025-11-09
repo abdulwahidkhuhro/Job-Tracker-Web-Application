@@ -81,23 +81,23 @@
 		Purpose: This is the core of Spring Security, providing the fundamental APIs and classes. -->
 		<!-- Use case: If you are building a custom security solution without using web features (like a console app or a REST API without Spring MVC), you could include just this. -->
 
-		
+
 		<!-- https://mvnrepository.com/artifact/org.springframework.security/spring-security-core -->
 		<!-- <dependency>
 			<groupId>org.springframework.security</groupId>
 			<artifactId>spring-security-core</artifactId>
 			<version>7.0.0-RC1</version>
-		</dependency> -->  
+		</dependency> -->
 		<!-- GroupId / ArtifactId: org.springframework.security / spring-security-web
 		Purpose: Provides web-related security features. -->
 		<!-- Use case: Needed for securing HTTP requests in web applications.
 		Usually depends on spring-security-core internally. -->
 
 
-		<dependency>
+		<!-- <dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-security</artifactId>
-		</dependency>
+		</dependency> -->
 		<!-- GroupId / ArtifactId: org.springframework.boot / spring-boot-starter-security
 		Purpose: Spring Boot starter that pulls in all necessary Spring Security dependencies automatically. -->
 		<!-- Use case:This is the recommended dependency for Spring Boot projects.
@@ -110,6 +110,24 @@
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
+
+
+
+		<!-- Spring Boot Starter Mail -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-mail</artifactId>
+		</dependency>
+
+		<!-- Spring Boot Starter for Scheduling -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter</artifactId>
+		</dependency>
+
+
+
+
 	</dependencies>
 
 

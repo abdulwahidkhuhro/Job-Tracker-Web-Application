@@ -1,0 +1,55 @@
+/* style.css - placeholder for Job Tracker */
+
+/* Basic reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Body styling */
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    background-color: #ffffff; /* white background */
+    color: #000000; /* black text */
+    line-height: 1.6;
+}
+
+/* Header */
+header {
+    background-color: #000000; /* black header */
+    color: #ffffff;
+    padding: 1rem;
+    text-align: center;
+}
+
+/* Links */
+a {
+    color: #000000;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+/* Container */
+.container {
+    width: 90%;
+    max-width: 1200px;
+    margin: 2rem auto;
+}
+
+/* Buttons */
+button {
+    padding: 0.5rem 1rem;
+    background-color: #000000;
+    color: #ffffff;
+    border: none;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+button:hover {
+    background-color: #333333;
+}
