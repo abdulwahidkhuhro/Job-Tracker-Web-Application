@@ -9,6 +9,9 @@ target/
 *.ipr
 *.class
 
+# ignore environment secrets
+.env
+
 ### Eclipse ###
 .classpath
 .project

@@ -3,6 +3,7 @@ package com.spring.boot.job.tracker.app.service;
 import java.sql.SQLException;
 import java.util.Optional;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.spring.boot.job.tracker.app.dtos.UserRequestDto;
@@ -11,9 +12,10 @@ import com.spring.boot.job.tracker.app.dtos.user.UserLoginDto;
 import com.spring.boot.job.tracker.app.dtos.user.UserRegistrationDto;
 import com.spring.boot.job.tracker.app.entity.User;
 import com.spring.boot.job.tracker.app.exception.UserAlreadyExistsException;
-import com.spring.boot.job.tracker.app.exception.UserAuthenticationExceptionHandler;
+import com.spring.boot.job.tracker.app.exception.UserAuthenticationException;
 import com.spring.boot.job.tracker.app.repository.UserRepository;
 
+import jakarta.mail.MessagingException;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 
@@ -21,15 +23,18 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 public class UserService {
 
-    private final UserRepository userRepository;
+    private final UserRepository USER_REPOSITORY;
 
-    public UserService(UserRepository userRepository) {
-        this.userRepository = userRepository;
+    @Autowired
+    private EmailService emailServiceObj;
+
+    public UserService(UserRepository USER_REPOSITORY) {
+        this.USER_REPOSITORY = USER_REPOSITORY;
     }
 
     public UserResponseDto getUserDetails(UserRequestDto requestDto) {
 
-        Optional<User> userOptional = userRepository.findByUsername(requestDto.getUserId());
+        Optional<User> userOptional = USER_REPOSITORY.findByUsername(requestDto.getUserId());
         if (userOptional.isPresent()) {
             User user = userOptional.get();
             UserResponseDto response = new UserResponseDto();
@@ -46,11 +51,11 @@ public class UserService {
     @Transactional
     public void registerUser(UserRegistrationDto userDto) {
 
-        if (userRepository.existsByUsername(userDto.getUsername())) {
+        if (USER_REPOSITORY.existsByUsername(userDto.getUsername())) {
             throw new UserAlreadyExistsException("Username already exists: " + userDto.getUsername());
-        } else if (userRepository.existsByEmail(userDto.getEmail())) {
+        } else if (USER_REPOSITORY.existsByEmail(userDto.getEmail())) {
             throw new UserAlreadyExistsException("Email already exists: " + userDto.getEmail());
-        } 
+        }
 
         log.info("Registering user {}", userDto);
         User userEntity = User.builder()
@@ -70,22 +75,19 @@ public class UserService {
                 .profileImageUrl(null)
                 .build();
 
-        User savedUser = userRepository.save(userEntity);
+        User savedUser = USER_REPOSITORY.save(userEntity);
         log.info("User registered successfully with ID: {}", savedUser.getUserId());
     }
 
-    public boolean authenticateUser(UserLoginDto userLoginDto) {
-        Optional<User> user = userRepository.findByUsername(userLoginDto.getUsername());
+    public void authenticateUser(UserLoginDto userLoginDto) throws MessagingException {
+        User user = USER_REPOSITORY.findByUsernameOrEmail(userLoginDto.getUsername())
+                .orElseThrow(
+                        () -> new UserAuthenticationException("No User found against given email or username!"));
 
-        if (user.isEmpty()) {
-            user = userRepository.findByEmail(userLoginDto.getUsername());
-        }
-
-        log.debug("Fetched user from db for authentication {}",user);
-
-        return user
-                .map(u -> u.getPassword().equals(userLoginDto.getPassword()))
-                .orElse(false);
+        if (user.getPassword().equals(userLoginDto.getPassword())) {
+            emailServiceObj.sendWelcomeEmail(user.getEmail(), user.getFullName());
+        } else
+            throw new UserAuthenticationException("Invalid Credentials!");
     }
 
 }

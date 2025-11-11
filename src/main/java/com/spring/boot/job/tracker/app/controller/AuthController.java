@@ -11,10 +11,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import com.spring.boot.job.tracker.app.dtos.user.UserLoginDto;
 import com.spring.boot.job.tracker.app.dtos.user.UserRegistrationDto;
-import com.spring.boot.job.tracker.app.exception.UserAuthenticationExceptionHandler;
 import com.spring.boot.job.tracker.app.service.EmailService;
 import com.spring.boot.job.tracker.app.service.UserService;
 
+import jakarta.mail.MessagingException;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -23,9 +23,6 @@ public class AuthController {
 
     @Autowired
     private UserService userServiceObj;
-
-    @Autowired
-    private EmailService emailServiceObj;
 
     // @Autowired -- If there is only one constructor, @Autowired can be omitted
     // public AuthController(UserService userService, EmailService emailServiceObj) {
@@ -40,33 +37,10 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public String processUserLogin(@ModelAttribute("user") UserLoginDto userLoginDto, Model model) {
+    public String processUserLogin(@ModelAttribute("user") UserLoginDto userLoginDto, Model model) throws MessagingException {
         log.info("Authenticate user for login {}", userLoginDto);
-        if (userServiceObj.authenticateUser(userLoginDto)) {
-
-            emailServiceObj.sendEmail(
-                    "test@gmail.com", 
-                    "Welcome Back to Job Tracker!",
-                    "Hi " + userLoginDto.getUsername()
-                            + ", welcome back! You can now manage your job applications easily."
-
-            );
-
-            return "redirect:/user/dashboard?username=" + userLoginDto.getUsername();
-        } else {
-
-                    System.out.println("Sending Email in else");
-
-                   emailServiceObj.sendEmail(
-                    "test@gmail.com", 
-                    "Unauthorized Access to the Account",
-                    "Hi " + userLoginDto.getUsername()
-                            + ", Someone tried to login into your account, consider changing your password."
-
-            );
-            model.addAttribute("loginError", "Invalid username or password!");
-            return "login";
-        }
+        userServiceObj.authenticateUser(userLoginDto);
+        return "redirect:/user/dashboard?username=" + userLoginDto.getUsername();
     }
 
     @GetMapping("/register")
