@@ -23,7 +23,7 @@ import java.util.UUID;
         @UniqueConstraint(name = "uc_users_username", columnNames = "username"),
         @UniqueConstraint(name = "uc_users_email", columnNames = "email")
 })
-public class User {
+public class UserEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)

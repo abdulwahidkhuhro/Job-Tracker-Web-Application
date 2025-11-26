@@ -1,6 +1,6 @@
 package com.spring.boot.job.tracker.app.repository;
 
-import com.spring.boot.job.tracker.app.entity.User;
+import com.spring.boot.job.tracker.app.entity.UserEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -10,17 +10,17 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Repository
-public interface UserRepository extends JpaRepository<User, UUID> {
+public interface UserRepository extends JpaRepository<UserEntity, UUID> {
 
     // 🔹 Find by username
-    Optional<User> findByUsername(String username);
+    Optional<UserEntity> findByUsername(String username);
 
     // 🔹 Find by username or email
-    @Query("SELECT u FROM User u WHERE u.username = :login OR u.email = :login")
-    Optional<User> findByUsernameOrEmail(@Param("login") String login);
+    @Query("SELECT u FROM UserEntity u WHERE u.username = :login OR u.email = :login")
+    Optional<UserEntity> findByUsernameOrEmail(@Param("login") String login);
 
     // 🔹 Find by email
-    Optional<User> findByEmail(String email);
+    Optional<UserEntity> findByEmail(String email);
 
     // 🔹 Check if email exists (for signup validation)
     boolean existsByEmail(String email);
@@ -29,9 +29,9 @@ public interface UserRepository extends JpaRepository<User, UUID> {
     boolean existsByUsername(String username);
 
     // 🔹 Find active user by email
-    Optional<User> findByEmailAndIsActiveTrue(String email);
+    Optional<UserEntity> findByEmailAndIsActiveTrue(String email);
 
     // 🔹 Example of custom query (native or JPQL)
-    @Query("SELECT u FROM User u WHERE u.isActive = true AND u.accountLocked = false")
-    Iterable<User> findAllActiveUnlockedUsers();
+    @Query("SELECT u FROM UserEntity u WHERE u.isActive = true AND u.accountLocked = false")
+    Iterable<UserEntity> findAllActiveUnlockedUsers();
 }

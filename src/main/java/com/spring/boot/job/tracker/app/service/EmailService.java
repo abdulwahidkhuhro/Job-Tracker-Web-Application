@@ -44,7 +44,7 @@ public class EmailService {
 
 
     @Async
-    public void sendEmailOTP(String to, String username, String otp) throws MessagingException {
+    public void sendEmailOTP(String to, String username, int otp) throws MessagingException {
         MimeMessage message = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message, false); 
 

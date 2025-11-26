@@ -35,4 +35,11 @@ public class GlobalExceptionHandler {
         model.addAttribute("errorMessage", ex.getMessage() != null ? ex.getMessage() : "An unexpected error occurred.");
         return "/exception/generic_exception";
     }
+
+    @ExceptionHandler(UserNotFoundException.class)
+    public String handleUserNotFoundException(Exception ex, Model model) {
+        model.addAttribute("errorTitle", "Something Went Wrong");
+        model.addAttribute("errorMessage", ex.getMessage() != null ? ex.getMessage() : "An unexpected error occurred.");
+        return "/exception/generic_exception";
+    }
 }

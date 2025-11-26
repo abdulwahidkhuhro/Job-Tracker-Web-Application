@@ -1,6 +1,5 @@
 package com.spring.boot.job.tracker.app.controller;
 
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -10,6 +9,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import com.spring.boot.job.tracker.app.dtos.user.UserLoginDto;
 import com.spring.boot.job.tracker.app.dtos.user.UserRegistrationDto;
+import com.spring.boot.job.tracker.app.service.AuthenticationService;
+import com.spring.boot.job.tracker.app.service.OTPService;
 import com.spring.boot.job.tracker.app.service.UserService;
 
 import jakarta.mail.MessagingException;
@@ -17,19 +18,21 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestBody;
 
-
-
 @Slf4j
 @Controller
 public class AuthController {
 
     @Autowired
-    private UserService userServiceObj;
+    private AuthenticationService authService;
+
+    @Autowired
+    private OTPService otpService;
 
     // @Autowired -- If there is only one constructor, @Autowired can be omitted
-    // public AuthController(UserService userService, EmailService emailServiceObj) {
-    //     this.userServiceObj = userService;
-    //     this.emailServiceObj = emailServiceObj;
+    // public AuthController(UserService userService, EmailService emailServiceObj)
+    // {
+    // this.userServiceObj = userService;
+    // this.emailServiceObj = emailServiceObj;
     // }
 
     @GetMapping("/login")
@@ -39,37 +42,10 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public String processUserLogin(@ModelAttribute("user") UserLoginDto userLoginDto, Model model) throws MessagingException {
+    public String processUserLogin(@ModelAttribute("user") UserLoginDto userLoginDto, Model model)throws MessagingException {
         log.info("Authenticate user for login {}", userLoginDto);
-        userServiceObj.authenticateUser(userLoginDto);
+        authService.authenticateUser(userLoginDto);
         return "redirect:/user/dashboard?username=" + userLoginDto.getUsername();
-    }
-
-    @GetMapping("/register")
-    public String register(Model model) {
-
-        UserRegistrationDto userDto = new UserRegistrationDto();
-        userDto.setUsername("test_123");
-        userDto.setFullName("TESTING");
-        userDto.setAddress("KARACHI");
-        userDto.setEmail("test@example.com");
-        userDto.setPassword("password");
-        userDto.setPhoneNumber("1234567890");
-        userDto.setAge(30);
-        userDto.setGender("MALE");
-        userDto.setRole("USER");
-        userDto.setPassword("test@123");
-
-        model.addAttribute("user", userDto);
-        return "register";
-    }
-
-    @PostMapping("/register")
-    public String register(@ModelAttribute("user") UserRegistrationDto userDto, RedirectAttributes redirectAttributes) {
-        log.info("User Registration Request Dto: {}", userDto);
-        userServiceObj.registerUser(userDto);
-        redirectAttributes.addFlashAttribute("registrationSuccess", true);
-        return "redirect:/register";
     }
 
     @GetMapping("/reset")
@@ -78,18 +54,29 @@ public class AuthController {
         return "reset";
     }
 
-    @PostMapping("/reset")
-    public String handleReset(@RequestParam("identifier") String usernameOrEmail,Model model) throws MessagingException {
-        
-        log.info("Reset Account for user = " + usernameOrEmail);
+    @PostMapping("/OTP")
+    public String sendEmailOTP(@RequestParam("identifier") String email, Model model)throws MessagingException {
 
-        userServiceObj.resetPassword(usernameOrEmail);
+        log.info("Reset Account for user = {}" , email);
+
+        otpService.sendOtp(email);
 
         model.addAttribute("message", "If this account exists, an OTP has been sent.");
-        return "reset";
+        model.addAttribute("email" , email);
+        return "otp_verification";
     }
 
+    @PostMapping("/verifyOTP")
+    public String verifyOTP(@RequestParam("otp") String otp , @RequestParam("email") String email) {
+
+        // HIDDEN FIELD FROM otp_verification
+        log.info("VERIFY OTP FOR EMAIL: {}" , email);
+        if(otpService.verifyOtp(otp , email))
+            return "redirect:/user/dashboard?username=" + email;
+ 
+
     
-    
+        return "entity";
+    }
 
 }
