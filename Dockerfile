@@ -19,6 +19,6 @@ COPY --from=buildstage /app/target/job-traker-web-application.jar /app/
 
 EXPOSE 8080
 
-ENTRYPOINT ["java", "-jar", "target/job-traker-web-application.jar"]
+ENTRYPOINT ["java", "-jar", "/app/target/job-traker-web-application.jar"]
 
 
