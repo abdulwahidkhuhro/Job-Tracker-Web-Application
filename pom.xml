@@ -132,6 +132,7 @@
 
 
 	<build>
+        <finalName>job-traker-web-application</finalName>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
