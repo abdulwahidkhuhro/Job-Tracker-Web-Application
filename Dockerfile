@@ -5,7 +5,7 @@ FROM maven:3.9.6-eclipse-temurin-21 AS buildstage
 
 WORKDIR /app
 
-COPY . /app
+COPY . .
 
 RUN mvn clean package -DskipTests
 
